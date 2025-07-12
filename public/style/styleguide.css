@@ -1,0 +1,76 @@
+:root {
+    --blue-100: rgba(120, 158, 211, 1);
+    --blue-200: rgba(50, 93, 154, 1);
+    --blue-300: rgba(31, 58, 96, 1);
+    --blue-400: rgba(12, 23, 39, 1);
+    --blue-500: rgba(4, 7, 12, 1);
+    --gray-100: rgba(145, 145, 145, 1);
+    --gray-200: rgba(82, 82, 82, 1);
+    --gray-300: var(--collection-1-second-color);
+    --gray-400: rgba(18, 18, 18, 1);
+    --gray-500: rgba(8, 8, 8, 1);
+    --orange-100: rgba(251, 234, 218, 1);
+    --orange-200: rgba(238, 167, 104, 1);
+    --orange-300: var(--collection-1-orange);
+    --orange-400: rgba(170, 90, 19, 1);
+    --orange-500: rgba(55, 29, 6, 1);
+    --green-100: rgba(180, 238, 205, 1);
+    --green-200: rgba(76, 215, 135, 1);
+    --green-300: var(--collection-1-green);
+    --green-400: rgba(25, 112, 62, 1);
+    --green-500: rgba(2, 8, 5, 1);
+    --red-100: rgba(253, 242, 241, 1);
+    --red-200: rgba(239, 138, 128, 1);
+    --red-300: var(--collection-1-red);
+    --red-400: rgba(191, 39, 23, 1);
+    --red-500: rgba(77, 16, 9, 1);
+    --yellow-100: rgba(252, 243, 207, 1);
+    --yellow-200: rgba(245, 214, 86, 1);
+    --yellow-300: var(--collection-1-yellow);
+    --yellow-400: rgba(169, 137, 10, 1);
+    --yellow-500: rgba(48, 39, 3, 1);
+    --scale-gray100: rgba(252, 252, 253, 1);
+    --scale-gray200: rgba(249, 250, 251, 1);
+    --scale-gray300: rgba(243, 245, 247, 1);
+    --scale-gray400: rgba(197, 207, 216, 1);
+    --scale-gray500: rgba(121, 144, 165, 1);
+    --collection-1-primary-color: rgba(31, 58, 96, 1);
+    --collection-1-second-color: rgba(44, 44, 44, 1);
+    --collection-1-orange: rgba(230, 126, 34, 1);
+    --collection-1-cinza-claro: rgba(242, 242, 242, 1);
+    --collection-1-white: rgba(255, 255, 255, 1);
+    --collection-1-green: rgba(39, 174, 96, 1);
+    --collection-1-red: rgba(231, 76, 60, 1);
+    --collection-1-yellow: rgba(241, 196, 15, 1);
+  }
+  
+  /*
+  
+  To enable a theme in your HTML, simply add one of the following data attributes to an HTML element, like so:
+  
+  <body data-collection-1-mode="ligth">
+      <!-- the rest of your content -->
+  </body>
+  
+  You can apply the theme on any DOM node, not just the `body`
+  
+  */
+  
+  [data-collection-1-mode="ligth"] {
+    --collection-1-second-color: rgba(44, 44, 44, 1);
+    --collection-1-orange: rgba(230, 126, 34, 1);
+    --collection-1-cinza-claro: rgba(242, 242, 242, 1);
+    --collection-1-green: rgba(39, 174, 96, 1);
+    --collection-1-red: rgba(231, 76, 60, 1);
+    --collection-1-yellow: rgba(241, 196, 15, 1);
+  }
+  
+  [data-collection-1-mode="dark"] {
+    --collection-1-second-color: rgba(255, 255, 255, 1);
+    --collection-1-orange: rgba(255, 255, 255, 1);
+    --collection-1-cinza-claro: rgba(255, 255, 255, 1);
+    --collection-1-green: rgba(255, 255, 255, 1);
+    --collection-1-red: rgba(255, 255, 255, 1);
+    --collection-1-yellow: rgba(255, 255, 255, 1);
+  }
+  

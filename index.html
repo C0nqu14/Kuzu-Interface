@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>Kuzú - Login</title>
+    <link rel="stylesheet" href="public/style/globals.css" />
+    <link rel="stylesheet" href="public/style/styleguide.css" />
+    <link rel="stylesheet" href="public/style/style.css" /> </head>
+  <body>
+    <main class="login-page">
+      <div class="login-content-wrapper">
+        <section class="login-form-section">
+          <div class="hgroup">
+            <h1 class="text-wrapper">LOGIN</h1>
+            <p class="description-text">
+              <span class="span">Faça seu login e comece a monitorar a sua </span>
+              <span class="text-wrapper-2">Kuzú</span>
+              <span class="span">!</span>
+            </p>
+          </div>
+          <form class="INPUTS" id="loginForm"> <div class="input-container">
+              <label for="username" class="sr-only">Username</label>
+              <input type="text" id="username" class="input-field" placeholder="Username" />
+              <img class="input-icon" src="public/img/UserOutline(1).png" alt="Ícone de usuário" />
+            </div>
+            <div class="input-container">
+              <label for="password" class="sr-only">Password</label>
+              <input type="password" id="password" class="input-field" placeholder="Password" />
+              <img class="input-icon" src="public/img/visibility_off.png" alt="Mostrar/Esconder senha" />
+            </div>
+            <button type="submit" class="login-button" id="loginSubmitButton"> <div class="button-text">Login</div>
+            </button>
+            <p id="errorMessage" class="error-message" style="display: none; color: red; margin-top: 15px; text-align: center;"></p>
+          </form>
+        </section>
+        <aside class="login-image-section">
+          <img class="kuzu-logo" src="public/img/Kuzú (1) 1.png" alt="Logotipo Kuzú" />
+        </aside>
+      </div>
+    </main>
+
+    <script>
+        const loginForm = document.getElementById('loginForm'); // Seleciona o formulário pelo ID
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', async (event) => { // Ouve o evento 'submit' do formulário
+            event.preventDefault(); // IMPEDE O COMPORTAMENTO PADRÃO DE ENVIO DO FORMULÁRIO (RECARREGAR PÁGINA)
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            errorMessage.style.display = 'none'; // Esconde a mensagem de erro anterior
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include' // IMPORTANTE: Envia cookies junto com a requisição
+                });
+
+                const data = await response.json();
+
+                if (response.ok) { // Status 200-299
+                    console.log('Login bem-sucedido:', data);
+                    // Redirecionar para o dashboard após login bem-sucedido
+                    window.location.href = 'dashboard.html';
+                } else {
+                    console.error('Erro no login:', data.message || 'Erro desconhecido');
+                    errorMessage.textContent = data.message || 'Nome de usuário ou senha inválidos.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro de rede ou na requisição:', error);
+                errorMessage.textContent = 'Não foi possível conectar ao servidor. Tente novamente.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+  </body>
+</html>

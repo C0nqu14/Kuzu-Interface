@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>Kuzú - Detentos</title>
+    <link rel="stylesheet" href="public/style/globals.css" />
+    <link rel="stylesheet" href="public/style/styleguide.css" />
+    <link rel="stylesheet" href="public/style/ver-criminosos.css" />
+  </head>
+  <body>
+    <div class="main-layout">
+      <nav class="sidebar-nav">
+        <div class="logo-wrapper">
+          <img class="logo" src="public/img/LOGO.png" alt="Logotipo Kuzú" />
+        </div>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/chart.png" alt="Ícone Dashboard" />
+            <a href="dashboard.html" class="menu-text">Dashboard</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/resume.png" alt="Ícone Ocorrências" />
+            <a href="#" class="menu-text">Ocorrências</a>
+          </li>
+          <li class="menu-item active">
+            <img class="menu-icon" src="public/img/handcuffs.png" alt="Ícone Detentos" />
+            <a href="ver-criminosos.html" class="menu-text">Detentos</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/more.png" alt="Ícone Adicionar Criminoso" />
+            <a href="adicionar-criminoso.html" class="menu-text">Add Criminoso</a>
+          </li>
+        </ul>
+        <div class="settings-section">
+          <img class="settings-icon" src="public/img/settings.png" alt="Ícone Definições" />
+          <a href="#" class="settings-text">Definições</a>
+        </div>
+      </nav>
+
+      <div class="main-content-area">
+        <header class="page-header">
+          <h1 class="page-title">Detentos Cadastrados</h1>
+          <button class="add-new-button" onclick="window.location.href='adicionar-criminoso.html'">Adicionar Novo</button>
+        </header>
+
+        <div class="search-bar">
+          <input type="text" placeholder="Pesquisar detentos..." class="search-input" id="searchInput" />
+          <button class="search-button">
+            <img src="public/img/search-icon.png" alt="Pesquisar" class="search-icon" />
+          </button>
+        </div>
+
+        <div class="detento-list" id="detentoList">
+          </div>
+
+        <div id="detalhesModal" class="modal">
+          <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalTitle">Detalhes do Detento</h2>
+            <form id="detalhesForm">
+              <div class="modal-body-grid">
+                  <div class="modal-form-group">
+                      <label for="modalNome">Nome:</label>
+                      <input type="text" id="modalNome" name="nome" readonly>
+                  </div>
+                  <div class="modal-form-group">
+                      <label for="modalIdade">Idade:</label>
+                      <input type="number" id="modalIdade" name="idade" readonly>
+                  </div>
+                  <div class="modal-form-group">
+                      <label for="modalCrimes">Crimes cometidos:</label>
+                      <input type="text" id="modalCrimes" name="crimes_cometidos" readonly>
+                  </div>
+                  <div class="modal-form-group">
+                      <label for="modalSentenca">Sentença:</label>
+                      <input type="text" id="modalSentenca" name="sentenca" readonly>
+                  </div>
+                  <div class="modal-form-group">
+                      <label for="modalStatus">Status:</label>
+                      <select id="modalStatus" name="status" disabled>
+                          <option value="Preso">Preso</option>
+                          <option value="Foragido">Foragido</option>
+                          <option value="Solto">Solto</option>
+                          <option value="Condicional">Condicional</option>
+                      </select>
+                  </div>
+                  <div class="modal-form-group">
+                      <label for="modalPericulosidade">Periculosidade:</label>
+                      <select id="modalPericulosidade" name="periculosidade" disabled>
+                          <option value="Baixa">Baixa</option>
+                          <option value="Média">Média</option>
+                          <option value="Alta">Alta</option>
+                      </select>
+                  </div>
+                  <div class="modal-form-group full-width">
+                      <label for="modalHistorico">Histórico de Movimentações:</label>
+                      <textarea id="modalHistorico" name="historico_movimentacoes" readonly></textarea>
+                  </div>
+                  <div class="modal-form-group full-width image-preview-container">
+                    <label>Foto:</label>
+                    <img id="modalFoto" src="" alt="Foto do Detento" style="max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover;">
+                    <input type="file" id="modalImageUpload" accept="image/*" style="display: none;">
+                    <button type="button" id="changeImageButton" class="modal-action-button" style="display: none;">Alterar Imagem</button>
+                  </div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" id="editSaveButton" class="modal-action-button">Editar</button>
+                <button type="button" id="cancelButton" class="modal-action-button" style="display: none;">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+    </div>
+
+    <script>
+      // Função para verificar o status de login (mantido de outras páginas)
+      async function checkLoginStatus() {
+          try {
+              const response = await fetch('http://127.0.0.1:5000/api/auth/status', {
+                  method: 'GET',
+                  credentials: 'include'
+              });
+
+              if (!response.ok) {
+                  window.location.href = 'index.html';
+              }
+          } catch (error) {
+              console.error('Erro ao verificar status do login:', error);
+              window.location.href = 'index.html';
+          }
+      }
+
+      document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+      const detentoList = document.getElementById('detentoList');
+      const searchInput = document.getElementById('searchInput');
+      const detalhesModal = document.getElementById('detalhesModal');
+      const closeButton = document.querySelector('.close-button');
+      const modalTitle = document.getElementById('modalTitle');
+      const detalhesForm = document.getElementById('detalhesForm');
+      const editSaveButton = document.getElementById('editSaveButton');
+      const cancelButton = document.getElementById('cancelButton');
+      const modalFoto = document.getElementById('modalFoto');
+      const modalImageUpload = document.getElementById('modalImageUpload');
+      const changeImageButton = document.getElementById('changeImageButton');
+
+      let currentDetentoId = null;
+      let isEditing = false;
+
+      // Função para carregar detentos da API
+      async function loadDetentos(searchTerm = '') {
+        try {
+          const url = searchTerm ? `http://127.0.0.1:5000/api/detentos/?search=${encodeURIComponent(searchTerm)}` : 'http://127.0.0.1:5000/api/detentos/';
+          const response = await fetch(url, { credentials: 'include' });
+          if (!response.ok) {
+            if (response.status === 401) { // Não autorizado, redirecionar para login
+                window.location.href = 'index.html';
+                return;
+            }
+            throw new Error('Falha ao carregar detentos.');
+          }
+          const detentos = await response.json();
+          renderDetentos(detentos);
+        } catch (error) {
+          console.error('Erro ao carregar detentos:', error);
+          detentoList.innerHTML = '<p class="error-message">Erro ao carregar detentos. Verifique sua conexão ou se o backend está rodando.</p>';
+        }
+      }
+
+      // Função para renderizar os detentos na grade
+      function renderDetentos(detentos) {
+        detentoList.innerHTML = ''; // Limpa o conteúdo existente
+        if (detentos.length === 0) {
+          detentoList.innerHTML = '<p class="no-results">Nenhum detento encontrado.</p>';
+          return;
+        }
+
+        detentos.forEach(detento => {
+          const detentoCard = document.createElement('div');
+          detentoCard.classList.add('criminal-card'); // Use sua classe criminal-card
+          detentoCard.dataset.id = detento.id; // Armazena o ID para ações futuras
+
+          // Use uma imagem padrão se foto_url for nula ou vazia
+          const imageUrl = detento.foto_url && detento.foto_url.trim() !== '' ? detento.foto_url : 'public/img/default-avatar.png';
+          
+          // Adiciona classes baseadas na periculosidade para estilização (se você tiver no CSS)
+          const periculosidadeClass = `periculosidade-${detento.periculosidade ? detento.periculosidade.toLowerCase() : 'desconhecida'}`;
+          const periculosidadeTextClass = detento.periculosidade === 'Alta' ? 'text-color-red' : '';
+
+
+          detentoCard.innerHTML = `
+            <img class="criminal-image" src="${imageUrl}" alt="Foto de ${detento.nome}" onerror="this.onerror=null;this.src='public/img/default-avatar.png';">
+            <div class="criminal-name">${detento.nome}</div>
+            <div class="criminal-info">Crime: ${detento.crimes_cometidos || 'N/A'}</div>
+            <div class="criminal-periculosidade">Periculosidade: <span class="${periculosidadeTextClass}">${detento.periculosidade || 'N/A'}</span></div>
+            <div class="criminal-actions">
+                <button class="details-button" data-id="${detento.id}">Ver Mais</button>
+                <button class="edit-button" data-id="${detento.id}">Editar</button>
+                <button class="delete-button" data-id="${detento.id}">Excluir</button>
+            </div>
+          `;
+          detentoList.appendChild(detentoCard);
+        });
+        attachEventListeners(); // Anexa eventos após renderizar
+      }
+
+      // Anexar event listeners aos botões
+      function attachEventListeners() {
+        document.querySelectorAll('.details-button').forEach(button => {
+          button.onclick = (e) => showDetentoDetails(e.target.dataset.id, false);
+        });
+        document.querySelectorAll('.edit-button').forEach(button => {
+          button.onclick = (e) => showDetentoDetails(e.target.dataset.id, true);
+        });
+        document.querySelectorAll('.delete-button').forEach(button => {
+          button.onclick = (e) => deleteDetento(e.target.dataset.id);
+        });
+      }
+
+      // Função para mostrar detalhes do detento no modal
+      async function showDetentoDetails(id, editMode) {
+        currentDetentoId = id;
+        isEditing = editMode;
+        try {
+          // Requisição GET para o detento específico (sem barra final após o ID)
+          const response = await fetch(`http://127.0.0.1:5000/api/detentos/${id}`, { credentials: 'include' });
+          if (!response.ok) {
+            if (response.status === 401) { // Não autorizado, redirecionar para login
+                window.location.href = 'index.html';
+                return;
+            }
+            throw new Error('Falha ao carregar detalhes do detento.');
+          }
+          const detento = await response.json();
+
+          modalTitle.textContent = editMode ? 'Editar Detento' : 'Detalhes do Detento';
+          document.getElementById('modalNome').value = detento.nome || '';
+          document.getElementById('modalIdade').value = detento.idade || '';
+          document.getElementById('modalCrimes').value = detento.crimes_cometidos || '';
+          document.getElementById('modalSentenca').value = detento.sentenca || '';
+          document.getElementById('modalHistorico').value = detento.historico_movimentacoes || '';
+
+          // Define os valores para os selects
+          document.getElementById('modalStatus').value = detento.status || '';
+          document.getElementById('modalPericulosidade').value = detento.periculosidade || '';
+
+          modalFoto.src = detento.foto_url || 'public/img/default-avatar.png';
+          modalFoto.style.display = 'block';
+
+          // Habilita/desabilita campos do formulário
+          const inputs = detalhesForm.querySelectorAll('input, select, textarea');
+          inputs.forEach(input => {
+              // Não alterar o display do input file, apenas o readOnly/disabled dos outros
+              if (input.id !== 'modalImageUpload') {
+                input.readOnly = !editMode;
+                input.disabled = !editMode;
+              }
+          });
+          
+          editSaveButton.textContent = editMode ? 'Salvar' : 'Editar';
+          cancelButton.style.display = editMode ? 'inline-block' : 'none';
+          changeImageButton.style.display = editMode ? 'inline-block' : 'none'; // Mostra botão de alterar imagem em modo edição
+
+          detalhesModal.style.display = 'block'; // Mostra o modal
+
+        } catch (error) {
+          console.error('Erro ao mostrar detalhes:', error);
+          alert('Erro ao carregar detalhes do detento.');
+        }
+      }
+
+      // Listener para o botão Editar/Salvar no modal
+      editSaveButton.addEventListener('click', async () => {
+          if (isEditing) { // Se estiver em modo de edição e clicou em Salvar
+              const updatedData = {
+                  nome: document.getElementById('modalNome').value,
+                  idade: parseInt(document.getElementById('modalIdade').value) || null,
+                  crimes_cometidos: document.getElementById('modalCrimes').value,
+                  sentenca: document.getElementById('modalSentenca').value,
+                  status: document.getElementById('modalStatus').value,
+                  periculosidade: document.getElementById('modalPericulosidade').value,
+                  historico_movimentacoes: document.getElementById('modalHistorico').value,
+                  foto_url: modalFoto.src // Pega a URL da imagem atual no modal
+              };
+
+              try {
+                  // Requisição PUT para atualizar o detento (sem barra final após o ID)
+                  const response = await fetch(`http://127.0.0.1:5000/api/detentos/${currentDetentoId}`, {
+                      method: 'PUT',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify(updatedData),
+                      credentials: 'include'
+                  });
+
+                  if (response.ok) {
+                      alert('Detento atualizado com sucesso!');
+                      detalhesModal.style.display = 'none'; // Fecha o modal
+                      isEditing = false; // Sai do modo de edição
+                      loadDetentos(); // Recarrega a lista para mostrar as mudanças
+                  } else {
+                      const errorData = await response.json();
+                      alert(`Erro ao atualizar: ${errorData.message || 'Erro desconhecido'}`);
+                  }
+              } catch (error) {
+                  console.error('Erro na requisição PUT:', error);
+                  alert('Erro de rede ao atualizar detento.');
+              }
+          } else { // Se não estiver em modo de edição e clicou em Editar
+              isEditing = true;
+              modalTitle.textContent = 'Editar Detento';
+              // Habilita todos os campos para edição
+              const inputs = detalhesForm.querySelectorAll('input, select, textarea');
+              inputs.forEach(input => {
+                  if (input.id !== 'modalImageUpload') {
+                    input.readOnly = false;
+                    input.disabled = false;
+                  }
+              });
+              editSaveButton.textContent = 'Salvar'; // Muda texto do botão para Salvar
+              cancelButton.style.display = 'inline-block'; // Mostra botão Cancelar
+              changeImageButton.style.display = 'inline-block'; // Mostra botão de alterar imagem
+          }
+      });
+
+      // Listener para o botão Cancelar no modal
+      cancelButton.addEventListener('click', () => {
+          detalhesModal.style.display = 'none'; // Fecha o modal
+          isEditing = false; // Sai do modo de edição
+      });
+
+      // Listener para o botão "Alterar Imagem"
+      changeImageButton.addEventListener('click', () => {
+          modalImageUpload.click(); // Simula o clique no input file escondido
+      });
+
+      // Listener para o input de upload de imagem no modal
+      modalImageUpload.addEventListener('change', function(event) {
+          const file = event.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  modalFoto.src = e.target.result; // Atualiza a pré-visualização da imagem
+              };
+              reader.readAsDataURL(file);
+          }
+      });
+
+      // Função para excluir detento
+      async function deleteDetento(id) {
+        if (confirm('Tem certeza que deseja excluir este detento? Esta ação é irreversível.')) {
+          try {
+            // Requisição DELETE para o detento específico (sem barra final após o ID)
+            const response = await fetch(`http://127.0.0.1:5000/api/detentos/${id}`, {
+              method: 'DELETE',
+              credentials: 'include'
+            });
+
+            if (response.ok) {
+              alert('Detento excluído com sucesso!');
+              loadDetentos(); // Recarrega a lista
+            } else {
+              if (response.status === 401) { // Não autorizado, redirecionar para login
+                  window.location.href = 'index.html';
+                  return;
+              }
+              const errorData = await response.json();
+              alert(`Erro ao excluir detento: ${errorData.message || 'Erro desconhecido'}`);
+            }
+          } catch (error) {
+            console.error('Erro na requisição DELETE:', error);
+            alert('Erro de rede ao excluir detento.');
+          }
+        }
+      }
+
+      // Fechar modal ao clicar no 'x'
+      closeButton.addEventListener('click', () => {
+        detalhesModal.style.display = 'none';
+        isEditing = false; // Reseta o modo de edição
+      });
+
+      // Fechar modal ao clicar fora dele
+      window.onclick = (event) => {
+        if (event.target == detalhesModal) {
+          detalhesModal.style.display = 'none';
+          isEditing = false; // Reseta o modo de edição
+        }
+      };
+
+      // Implementa a funcionalidade de busca ao pressionar Enter
+      searchInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+          loadDetentos(searchInput.value);
+        }
+      });
+      // Implementa a funcionalidade de busca ao clicar no botão
+      document.querySelector('.search-button').addEventListener('click', () => {
+        loadDetentos(searchInput.value);
+      });
+
+      // Carregar detentos ao carregar a página
+      document.addEventListener('DOMContentLoaded', loadDetentos);
+    </script>
+  </body>
+</html>

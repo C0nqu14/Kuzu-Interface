@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>Kuzú - Adicionar Criminoso</title>
+    <link rel="stylesheet" href="public/style/globals.css" />
+    <link rel="stylesheet" href="public/style/styleguide.css" />
+    <link rel="stylesheet" href="public/style/adicionar.css" />
+  </head>
+  <body>
+    <div class="main-layout">
+      <nav class="sidebar-nav">
+        <div class="logo-wrapper">
+          <img class="logo" src="public/img/LOGO.png" alt="Logotipo Kuzú" />
+        </div>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/chart.png" alt="Ícone Dashboard" />
+            <a href="dashboard.html" class="menu-text">Dashboard</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/resume.png" alt="Ícone Ocorrências" />
+            <a href="#" class="menu-text">Ocorrências</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/handcuffs.png" alt="Ícone Detentos" />
+            <a href="ver-criminosos.html" class="menu-text">Detentos</a>
+          </li>
+          <li class="menu-item active">
+            <img class="menu-icon" src="public/img/more.png" alt="Ícone Adicionar Criminoso" />
+            <a href="adicionar-criminoso.html" class="menu-text">Add Criminoso</a>
+          </li>
+        </ul>
+        <div class="settings-section">
+          <img class="settings-icon" src="public/img/settings.png" alt="Ícone Definições" />
+        </div>
+      </nav>
+
+      <div class="main-content-area">
+        <h1 class="page-title">Cadastrar Criminosos</h1>
+
+        <form class="add-criminal-form" id="addCriminalForm"> <div class="form-grid">
+            <div class="form-group">
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" id="nome" name="nome" class="form-input" placeholder="" required /> </div>
+
+            <div class="form-group">
+              <label for="idade" class="form-label">Idade</label>
+              <input type="number" id="idade" name="idade" class="form-input" placeholder="" />
+            </div>
+
+            <div class="form-group">
+              <label for="crimes" class="form-label">Crimes cometidos</label>
+              <input type="text" id="crimes" name="crimes" class="form-input" placeholder="" />
+            </div>
+
+            <div class="form-group">
+              <label for="sentenca" class="form-label">Sentença</label>
+              <input type="text" id="sentenca" name="sentenca" class="form-input" placeholder="" />
+            </div>
+
+            <div class="form-group">
+              <label for="status" class="form-label">Status</label>
+              <select id="status" name="status" class="form-input">
+                <option value="">Selecione o Status</option>
+                <option value="Preso">Preso</option>
+                <option value="Foragido">Foragido</option>
+                <option value="Solto">Solto</option>
+                <option value="Condicional">Condicional</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="periculosidade" class="form-label">Periculosidade</label>
+              <select id="periculosidade" name="periculosidade" class="form-input" required>
+                <option value="">Selecione a Periculosidade</option>
+                <option value="Baixa">Baixa</option>
+                <option value="Média">Média</option>
+                <option value="Alta">Alta</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width"> <label for="historico" class="form-label">Histórico de Movimentações</label>
+              <textarea id="historico" name="historico" class="form-input textarea-field" placeholder=""></textarea>
+            </div>
+          </div>
+
+          <div class="upload-area">
+            <p class="upload-text">Upload de Imagens</p>
+            <input type="file" id="imageUpload" name="images" accept="image/*" class="hidden-file-input">
+            <label for="imageUpload" class="upload-label"></label>
+            <img id="imagePreview" src="" alt="Pré-visualização da Imagem" style="max-width: 100px; max-height: 100px; display: none; margin-top: 10px;">
+          </div>
+
+          <button type="submit" class="submit-button">Cadastrar Criminoso</button>
+        </form>
+        <p id="formMessage" style="margin-top: 20px; font-weight: bold; text-align: center;"></p> </div>
+    </div>
+
+    <script>
+      // Função para verificar o status do login e redirecionar se não logado
+      async function checkLoginStatus() {
+          try {
+              const response = await fetch('http://127.0.0.1:5000/api/auth/status', {
+                  method: 'GET',
+                  credentials: 'include' // Envia cookies de sessão
+              });
+
+              if (!response.ok) { // Se não estiver logado (status 401, por exemplo)
+                  window.location.href = 'index.html'; // Redireciona para a página de login
+              }
+          } catch (error) {
+              console.error('Erro ao verificar status do login:', error);
+              window.location.href = 'index.html'; // Em caso de erro de rede, assume não logado
+          }
+      }
+
+      document.addEventListener('DOMContentLoaded', checkLoginStatus); // Executa ao carregar a página
+
+      const addCriminalForm = document.getElementById('addCriminalForm');
+      const formMessage = document.getElementById('formMessage');
+      const imageUpload = document.getElementById('imageUpload');
+      const imagePreview = document.getElementById('imagePreview');
+
+      // Pré-visualização da imagem
+      imageUpload.addEventListener('change', function(event) {
+          const file = event.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  imagePreview.src = e.target.result;
+                  imagePreview.style.display = 'block';
+              };
+              reader.readAsDataURL(file); // Lê o arquivo como URL base64
+          } else {
+              imagePreview.src = '';
+              imagePreview.style.display = 'none';
+          }
+      });
+
+
+      addCriminalForm.addEventListener('submit', async (event) => {
+          event.preventDefault(); // Impede o envio padrão do formulário
+
+          formMessage.style.display = 'none'; // Esconde a mensagem anterior
+          formMessage.style.color = 'black'; // Resetar cor da mensagem
+
+          // Coleta de dados do formulário
+          const nome = document.getElementById('nome').value;
+          const idade = document.getElementById('idade').value;
+          const crimes_cometidos = document.getElementById('crimes').value;
+          const sentenca = document.getElementById('sentenca').value;
+          const status = document.getElementById('status').value;
+          const periculosidade = document.getElementById('periculosidade').value; // Coleta o valor do campo Periculosidade
+          const historico_movimentacoes = document.getElementById('historico').value;
+          
+          // A URL da foto será a base64 da imagem para fins de demonstração.
+          const foto_url = imagePreview.style.display === 'block' ? imagePreview.src : '';
+
+          const criminalData = {
+              nome,
+              idade: idade ? parseInt(idade) : null, // Converte para número ou null
+              crimes_cometidos,
+              sentenca,
+              status,
+              periculosidade, // Inclui o campo periculosidade
+              historico_movimentacoes,
+              foto_url
+          };
+
+          try {
+              // URL CORRIGIDA com a barra final para o POST de novos detentos
+              const response = await fetch('http://127.0.0.1:5000/api/detentos/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(criminalData),
+                  credentials: 'include' // Envia cookies de sessão
+              });
+
+              const data = await response.json();
+
+              if (response.ok) { // Status 200-299
+                  formMessage.textContent = 'Criminoso cadastrado com sucesso!';
+                  formMessage.style.color = 'green';
+                  addCriminalForm.reset(); // Limpa o formulário após o sucesso
+                  imagePreview.src = ''; // Limpa a pré-visualização da imagem
+                  imagePreview.style.display = 'none'; // Esconde a pré-visualização
+              } else {
+                  console.error('Erro ao cadastrar criminoso:', data.message || 'Erro desconhecido');
+                  formMessage.textContent = `Erro ao cadastrar criminoso: ${data.message || 'Erro desconhecido'}`;
+                  formMessage.style.color = 'red';
+              }
+              formMessage.style.display = 'block'; // Mostra a mensagem
+
+          } catch (error) {
+              console.error('Erro de rede ou na requisição:', error);
+              formMessage.textContent = 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.';
+              formMessage.style.color = 'red';
+              formMessage.style.display = 'block'; // Mostra a mensagem
+          }
+      });
+    </script>
+  </body>
+</html>

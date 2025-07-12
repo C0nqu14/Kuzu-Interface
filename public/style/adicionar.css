@@ -1,0 +1,388 @@
+/* Importar variáveis e estilos globais/base - Assumidos do globals.css e styleguide.css */
+
+/* --- Layout Principal (Reutilizado do Dash e Ver Criminosos) --- */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--collection-1-cinza-claro); /* Fundo cinza claro */
+    overflow: hidden; /* Garante que não haja scroll indesejado no layout principal */
+  }
+  
+  /* --- Sidebar de Navegação (Reutilizada - copiar do dash.css ou ter um componente) --- */
+  /* Estes estilos devem vir de um arquivo central, como 'sidebar.css' ou 'components.css',
+     para evitar duplicação em dash.css, ver-criminosos.css e adicionar-criminoso.css.
+     Para este exemplo, estou replicando, mas idealmente seriam importados. */
+  .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      width: 240px;
+      background-color: var(--collection-1-primary-color);
+      padding: 20px 0;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      justify-content: space-between;
+      align-items: center;
+  }
+  
+  .sidebar-nav .logo-wrapper { margin-bottom: 40px; }
+  .sidebar-nav .logo { width: 180px; height: auto; object-fit: contain; }
+  .sidebar-nav .menu-list {
+      list-style: none; padding: 0; margin: 0; display: flex;
+      flex-direction: column; gap: 25px; width: 100%; flex-grow: 1;
+      align-items: flex-start;
+  }
+  .sidebar-nav .menu-item {
+      display: flex; align-items: center; gap: 15px; padding: 12px 30px;
+      width: 100%; cursor: pointer; transition: background-color 0.2s ease, padding-left 0.2s ease;
+  }
+  .sidebar-nav .menu-item:hover, .sidebar-nav .menu-item.active {
+      background-color: rgba(255, 255, 255, 0.1); padding-left: 35px;
+  }
+  .sidebar-nav .menu-icon {
+      width: 24px; height: 24px; filter: brightness(0) invert(1);
+  }
+  .sidebar-nav .menu-text {
+      font-family: "Inter-Medium", Helvetica; font-weight: 500;
+      color: #ffffff; font-size: 18px; white-space: nowrap; text-decoration: none;
+  }
+  .sidebar-nav .menu-item.active .menu-text {
+      font-family: "Inter-Bold", Helvetica; font-weight: 700; font-size: 20px;
+  }
+  .sidebar-nav .settings-section {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 15px; padding: 20px 0; width: 100%;
+  }
+  .sidebar-nav .settings-icon { width: 35px; height: 35px; filter: brightness(0) invert(1); }
+  .sidebar-nav .settings-text {
+      font-family: "Inter-Medium", Helvetica; font-weight: 500;
+      color: #ffffff; font-size: 16px; text-decoration: none;
+  }
+  
+  
+  /* --- Conteúdo Principal da Página "Adicionar Criminoso" --- */
+  .main-content-area {
+    flex-grow: 1; /* Ocupa o espaço restante */
+    display: flex;
+    flex-direction: column;
+    padding: 50px 80px; /* Mais padding para dar espaço */
+    box-sizing: border-box;
+    overflow-y: auto; /* Adiciona scroll apenas se o conteúdo exceder a altura */
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+  }
+  
+  /* --- Título da Página --- */
+  .page-title {
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: var(--blue-500);
+      font-size: 28px; /* Maior que os títulos de seção */
+      margin-bottom: 50px; /* Espaço abaixo do título */
+      text-align: center; /* Centralizado como na imagem */
+      width: 100%; /* Garante que ocupe a largura para centralizar */
+  }
+  
+  /* --- Formulário de Cadastro --- */
+  .add-criminal-form {
+      width: 100%;
+      max-width: 900px; /* Largura máxima do formulário */
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Centraliza itens do formulário */
+  }
+  
+  .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+      gap: 30px; /* Espaço entre os campos */
+      width: 100%;
+      margin-bottom: 40px; /* Espaço abaixo da grade de campos */
+  }
+  
+  .form-group {
+      background-color: var(--collection-1-white);
+      border-radius: 8px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+      padding: 15px 20px; /* Padding interno para o grupo (incluindo label/input) */
+      position: relative; /* Para posicionar o label/placeholder */
+      display: flex;
+      flex-direction: column; /* Label acima do input */
+  }
+  
+  .form-label {
+      font-family: "Inter-Regular", Helvetica;
+      font-weight: 400;
+      color: var(--gray-400); /* Cor do texto "Nome", "Idade", etc. */
+      font-size: 16px;
+      margin-bottom: 5px; /* Espaço entre o label e o input */
+      pointer-events: none; /* Garante que o clique passe para o input */
+  }
+  
+  .form-input {
+      border: none;
+      outline: none;
+      font-family: "Inter-Regular", Helvetica;
+      font-size: 18px; /* Tamanho da fonte do texto digitado */
+      color: var(--blue-500); /* Cor do texto digitado */
+      width: 100%; /* Ocupa a largura total do grupo */
+      background-color: transparent; /* Fundo transparente para não cobrir o padding do grupo */
+      box-sizing: border-box;
+  }
+  
+  /* --- Área de Upload de Imagens --- */
+  .upload-area {
+      width: 100%;
+      max-width: 600px; /* Largura máxima para a área de upload */
+      height: 180px; /* Altura fixa para a área de upload */
+      border: 2px dashed var(--gray-400); /* Borda tracejada */
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      background-color: var(--collection-1-white); /* Fundo branco */
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 50px; /* Espaço abaixo da área de upload */
+      position: relative; /* Para posicionar o label do input file */
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  
+  .upload-area:hover {
+      border-color: var(--collection-1-primary-color); /* Altera cor da borda no hover */
+      background-color: rgba(var(--collection-1-primary-color), 0.05); /* Fundo sutil no hover */
+  }
+  
+  .upload-text {
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      color: var(--gray-400);
+      font-size: 18px;
+      user-select: none; /* Impede seleção de texto */
+  }
+  
+  .hidden-file-input {
+      display: none; /* Esconde o input de arquivo padrão */
+  }
+  
+  .upload-label { /* Cria uma área clicável sobre a div */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      z-index: 1; /* Garante que seja clicável */
+  }
+  
+  /* --- Botão de Cadastrar --- */
+  .submit-button {
+      background-color: var(--collection-1-primary-color);
+      color: var(--collection-1-white);
+      font-family: "Inter-Medium", Helvetica;
+      font-weight: 500;
+      font-size: 18px;
+      padding: 15px 40px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      min-width: 250px; /* Largura mínima para o botão */
+  }
+  
+  .submit-button:hover {
+      background-color: var(--blue-400); /* Cor de hover para o botão */
+  }
+  
+  
+  /* --- Responsividade --- */
+  
+  /* Para telas menores que 1024px (tablets em modo paisagem) */
+  @media screen and (max-width: 1024px) {
+      .main-layout {
+          flex-direction: column; /* Sidebar empilhada */
+      }
+  
+      .sidebar-nav { /* Estilos da sidebar para mobile */
+          width: 100%; height: auto; flex-direction: row; justify-content: space-around;
+          padding: 15px 20px; gap: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .sidebar-nav .logo-wrapper { display: none; }
+      .sidebar-nav .menu-list { flex-direction: row; gap: 15px; flex-wrap: wrap; justify-content: center; flex-grow: 0; }
+      .sidebar-nav .menu-item { padding: 8px 15px; gap: 8px; width: auto; }
+      .sidebar-nav .menu-item:hover, .sidebar-nav .menu-item.active { padding-left: 15px; }
+      .sidebar-nav .menu-icon { width: 20px; height: 20px; }
+      .sidebar-nav .menu-text { font-size: 15px; }
+      .sidebar-nav .menu-item.active .menu-text { font-size: 16px; }
+      .sidebar-nav .settings-section { display: none; }
+  
+  
+      .main-content-area {
+          padding: 40px 30px; /* Padding ajustado */
+      }
+  
+      .page-title {
+          font-size: 24px;
+          margin-bottom: 40px;
+      }
+  
+      .add-criminal-form {
+          max-width: 700px; /* Ajuste da largura máxima do formulário */
+      }
+  
+      .form-grid {
+          grid-template-columns: 1fr; /* Uma única coluna em tablets */
+          gap: 25px;
+          margin-bottom: 30px;
+      }
+  
+      .form-group {
+          padding: 12px 18px;
+      }
+  
+      .form-label {
+          font-size: 15px;
+      }
+  
+      .form-input {
+          font-size: 16px;
+      }
+  
+      .upload-area {
+          max-width: 500px;
+          height: 160px;
+          margin-bottom: 40px;
+      }
+  
+      .upload-text {
+          font-size: 16px;
+      }
+  
+      .submit-button {
+          font-size: 16px;
+          padding: 12px 30px;
+          min-width: 200px;
+      }
+  }
+  
+  /* Para celulares menores que 768px */
+  @media screen and (max-width: 768px) {
+      .sidebar-nav { /* Estilos da sidebar para mobile */
+          padding: 10px 15px; gap: 10px;
+      }
+      .sidebar-nav .menu-item { padding: 6px 10px; gap: 5px; }
+      .sidebar-nav .menu-icon { width: 18px; height: 18px; }
+      .sidebar-nav .menu-text { font-size: 14px; }
+      .sidebar-nav .menu-item.active .menu-text { font-size: 15px; }
+  
+  
+      .main-content-area {
+          padding: 30px 20px;
+      }
+  
+      .page-title {
+          font-size: 22px;
+          margin-bottom: 30px;
+      }
+  
+      .form-grid {
+          gap: 20px;
+          margin-bottom: 25px;
+      }
+  
+      .form-group {
+          padding: 10px 15px;
+      }
+  
+      .form-label {
+          font-size: 14px;
+      }
+  
+      .form-input {
+          font-size: 15px;
+      }
+  
+      .upload-area {
+          height: 140px;
+          margin-bottom: 30px;
+      }
+  
+      .upload-text {
+          font-size: 15px;
+      }
+  
+      .submit-button {
+          font-size: 15px;
+          padding: 10px 25px;
+          min-width: 180px;
+      }
+  }
+  /* Exemplo de estilos para textarea e full-width. Adicione ao seu adicionar.css */
+
+/* Se o campo 'Histórico de Movimentações' for um textarea */
+.textarea-field {
+    min-height: 120px; /* Altura mínima para o textarea */
+    resize: vertical; /* Permite redimensionar verticalmente */
+    padding-top: 15px; /* Ajuste o padding para o texto não ficar colado ao topo */
+    padding-bottom: 15px;
+    /* Adicione outros estilos conforme seu design, como border, font-size, etc. */
+}
+
+/* Para campos que devem ocupar a largura total em grid de 2 colunas */
+.form-group.full-width {
+    grid-column: 1 / -1; /* Ocupa todas as colunas disponíveis na grid */
+}
+
+/* Estilos para a pré-visualização da imagem */
+.image-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+}
+
+#imagePreview {
+    border: 1px solid var(--gray-300); /* Use suas variáveis de cor */
+    border-radius: 8px;
+    object-fit: cover; /* Para garantir que a imagem não se estique */
+    margin-top: 10px;
+}
+
+/* Estilos para a mensagem de feedback */
+.form-message {
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.form-message.success {
+    background-color: #d4edda; /* Cor de fundo verde claro */
+    color: #155724; /* Cor do texto verde escuro */
+    border: 1px solid #c3e6cb;
+}
+
+.form-message.error {
+    background-color: #f8d7da; /* Cor de fundo vermelho claro */
+    color: #721c24; /* Cor do texto vermelho escuro */
+    border: 1px solid #f5c6cb;
+}
+
+
+/* Ajustes na responsividade para textarea e full-width (se necessário) */
+@media screen and (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: 1fr; /* Em telas menores, uma única coluna */
+    }
+    .form-group.full-width {
+        grid-column: auto; /* Desativa o full-width em coluna única */
+    }
+}
+@media screen and (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-group.full-width {
+        grid-column: auto;
+    }
+}

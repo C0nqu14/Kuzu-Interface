@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>Kuzú - Dashboard</title>
+    <link rel="stylesheet" href="public/style/globals.css" />
+    <link rel="stylesheet" href="public/style/styleguide.css" />
+    <link rel="stylesheet" href="public/style/dash.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <nav class="sidebar-nav">
+        <div class="logo-wrapper">
+          <img class="logo" src="public/img/LOGO.png" alt="Logotipo Kuzú" />
+        </div>
+        <ul class="menu-list">
+          <li class="menu-item active">
+            <img class="menu-icon" src="public/img/chart.png" alt="Ícone Dashboard" />
+            <a href="dashboard.html" class="menu-text">Dashboard</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/resume.png" alt="Ícone Ocorrências" />
+            <a href="#" class="menu-text">Ocorrências</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/handcuffs.png" alt="Ícone Detentos" />
+            <a href="ver-criminosos.html" class="menu-text">Detentos</a>
+          </li>
+          <li class="menu-item">
+            <img class="menu-icon" src="public/img/more.png" alt="Ícone Adicionar Criminoso" />
+            <a href="adicionar-criminoso.html" class="menu-text">Add Criminoso</a>
+          </li>
+        </ul>
+        <div class="settings-section">
+          <img class="settings-icon" src="public/img/settings.png" alt="Ícone Definições" />
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <header class="main-header">
+          <h1 class="welcome-title">Olá, <span id="userName">ADMIN!</span> Bem-vindo ao Dashboard.</h1>
+          <button class="logout-button" id="logoutButton">
+            <span class="logout-text">Logout</span>
+          </button>
+        </header>
+
+        <div class="dashboard-stats-grid">
+            <div class="stat-card total-detentos">
+                <span class="stat-value" id="totalDetentos">0</span>
+                <span class="stat-label">Total de Detentos</span>
+            </div>
+            <div class="stat-card presos">
+                <span class="stat-value" id="detentosPresos">0</span>
+                <span class="stat-label">Detentos Presos</span>
+            </div>
+            <div class="stat-card foragidos">
+                <span class="stat-value" id="detentosForagidos">0</span>
+                <span class="stat-label">Detentos Foragidos</span>
+            </div>
+            <div class="stat-card alta-periculosidade">
+                <span class="stat-value" id="detentosAltaPericulosidade">0</span>
+                <span class="stat-label">Alta Periculosidade</span>
+            </div>
+        </div>
+
+        <div class="dashboard-charts">
+          <div class="charts-grid">
+            <div class="chart-card pie-chart-card">
+              <h3 class="chart-title">Crimes Mais Comuns</h3>
+              <canvas id="pieChart"></canvas>
+            </div>
+
+            <div class="chart-card bar-chart-card">
+              <h3 class="chart-title">Status dos Detentos</h3>
+              <canvas id="barChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script>
+      // Registra o plugin DataLabels globalmente (se não estiver já registrado)
+      Chart.register(ChartDataLabels);
+
+      // Função para verificar o status de login
+      async function checkLoginStatus() {
+          try {
+              const response = await fetch('http://127.0.0.1:5000/api/auth/status', {
+                  method: 'GET',
+                  credentials: 'include'
+              });
+
+              if (!response.ok) {
+                  window.location.href = 'index.html'; // Redireciona para o login se não estiver autenticado
+              }
+              const data = await response.json();
+              if (data.username) {
+                  document.getElementById('userName').textContent = data.username;
+              }
+          } catch (error) {
+              console.error('Erro ao verificar status do login:', error);
+              window.location.href = 'index.html';
+          }
+      }
+
+      // Função para realizar o logout
+      async function logout() {
+          try {
+              const response = await fetch('http://127.0.0.1:5000/api/auth/logout', {
+                  method: 'POST',
+                  credentials: 'include' // Envia os cookies de sessão
+              });
+
+              if (response.ok) {
+                  alert('Logout realizado com sucesso!');
+                  window.location.href = 'index.html'; // Redireciona para a página de login
+              } else {
+                  const errorData = await response.json();
+                  alert(`Erro ao fazer logout: ${errorData.message || 'Erro desconhecido'}`);
+              }
+          } catch (error) {
+              console.error('Erro de rede ao fazer logout:', error);
+              alert('Erro de rede ao fazer logout.');
+          }
+      }
+
+      // Adiciona listener para o botão de logout
+      document.getElementById('logoutButton').addEventListener('click', logout);
+
+
+      // Funções para carregar dados do backend e atualizar os gráficos
+      async function loadDashboardData() {
+          try {
+              const response = await fetch('http://127.0.0.1:5000/api/dashboard_stats', {
+                  method: 'GET',
+                  credentials: 'include'
+              });
+
+              if (!response.ok) {
+                  if (response.status === 401) {
+                      window.location.href = 'index.html';
+                      return;
+                  }
+                  throw new Error('Falha ao carregar dados do dashboard.');
+              }
+              const data = await response.json();
+              console.log('Dados do Dashboard recebidos:', data); // Para depuração
+
+              // Atualizar os cards de estatísticas
+              document.getElementById('totalDetentos').textContent = data.total_detentos || 0;
+              document.getElementById('detentosPresos').textContent = data.detentos_status.Preso || 0;
+              document.getElementById('detentosForagidos').textContent = data.detentos_status.Foragido || 0;
+              document.getElementById('detentosAltaPericulosidade').textContent = data.detentos_periculosidade.Alta || 0;
+
+              // Atualizar Gráfico de Pizza (Crimes Mais Comuns)
+              const pieLabels = Object.keys(data.crimes_comuns).map(crime => `${crime} (${data.crimes_comuns[crime]})`);
+              const pieData = Object.values(data.crimes_comuns);
+              
+              updatePieChart(pieLabels, pieData);
+
+              // Atualizar Gráfico de Barras (Status dos Detentos)
+              const barLabels = Object.keys(data.detentos_status);
+              const barData = Object.values(data.detentos_status);
+              updateBarChart(barLabels, barData);
+
+          } catch (error) {
+              console.error('Erro ao carregar dados do dashboard:', error);
+              // Pode adicionar uma mensagem de erro na UI se desejar
+          }
+      }
+
+      let pieChartInstance = null;
+      let barChartInstance = null;
+
+      function updatePieChart(labels, data) {
+          if (pieChartInstance) {
+              pieChartInstance.destroy(); // Destrói a instância anterior do gráfico
+          }
+          const pieCtx = document.getElementById('pieChart').getContext('2d');
+          pieChartInstance = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: data,
+                backgroundColor: [
+                  '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9900', '#C9CBCE'
+                ],
+                hoverOffset: 8
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'right', // Exibe a legenda à direita
+                  labels: {
+                    color: 'var(--blue-500)',
+                    font: {
+                      family: 'Inter-Regular',
+                      size: 14
+                    }
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      let label = context.label || '';
+                      if (label) {
+                        label += ': ';
+                      }
+                      if (context.parsed !== null) {
+                        label += context.parsed;
+                      }
+                      return label;
+                    }
+                  }
+                },
+                datalabels: {
+                    color: '#FFF', // Cor dos valores dentro das fatias
+                    font: {
+                      weight: 'bold',
+                      size: 16
+                    },
+                    formatter: (value, ctx) => {
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = (value / total * 100).toFixed(1) + '%';
+                        return percentage; // Mostra a porcentagem
+                    }
+                }
+              }
+            }
+          });
+      }
+
+      function updateBarChart(labels, data) {
+          if (barChartInstance) {
+              barChartInstance.destroy(); // Destrói a instância anterior do gráfico
+          }
+          const barCtx = document.getElementById('barChart').getContext('2d');
+          barChartInstance = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Número de Detentos',
+                data: data,
+                backgroundColor: '#84B4F1',
+                borderColor: '#84B4F1',
+                borderWidth: 1,
+                borderRadius: 8,
+                barThickness: 50
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                datalabels: { // Mostra os valores acima das barras
+                  anchor: 'end',
+                  align: 'top',
+                  color: 'var(--blue-500)',
+                  font: {
+                    weight: 'bold'
+                  },
+                  formatter: (value) => value // Mostra o valor numérico
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                  },
+                  ticks: {
+                    // Remover stepSize para que o Chart.js decida
+                    color: 'var(--gray-400)',
+                    font: {
+                      family: 'Inter-Regular',
+                      size: 14
+                    }
+                  }
+                },
+                x: {
+                  grid: {
+                    display: false
+                  },
+                  ticks: {
+                    color: 'var(--blue-500)',
+                    font: {
+                      family: 'Inter-Regular',
+                      size: 14
+                    }
+                  }
+                }
+              }
+            }
+          });
+      }
+
+      // Carrega os dados e inicia os gráficos ao carregar a página
+      document.addEventListener('DOMContentLoaded', () => {
+          checkLoginStatus(); // Verifica o login primeiro
+          loadDashboardData(); // Depois carrega os dados do dashboard
+      });
+    </script>
+  </body>
+</html>
