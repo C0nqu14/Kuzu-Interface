@@ -89,7 +89,7 @@
       // Função para verificar o status de login
       async function checkLoginStatus() {
           try {
-              const response = await fetch('http://127.0.0.1:5000/api/auth/status', {
+              const response = await fetch('https://api-kuzu.onrender.com/api/auth/status', {
                   method: 'GET',
                   credentials: 'include'
               });
@@ -110,7 +110,7 @@
       // Função para realizar o logout
       async function logout() {
           try {
-              const response = await fetch('http://127.0.0.1:5000/api/auth/logout', {
+              const response = await fetch('https://api-kuzu.onrender.com/api/auth/logout', {
                   method: 'POST',
                   credentials: 'include' // Envia os cookies de sessão
               });
@@ -135,7 +135,7 @@
       // Funções para carregar dados do backend e atualizar os gráficos
       async function loadDashboardData() {
           try {
-              const response = await fetch('http://127.0.0.1:5000/api/dashboard_stats', {
+              const response = await fetch('https://api-kuzu.onrender.com/api/dashboard_stats', {
                   method: 'GET',
                   credentials: 'include'
               });
