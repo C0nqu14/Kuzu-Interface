@@ -117,7 +117,7 @@
       // Função para verificar o status de login (mantido de outras páginas)
       async function checkLoginStatus() {
           try {
-              const response = await fetch('http://127.0.0.1:5000/api/auth/status', {
+              const response = await fetch('https://api-kuzu.onrender.com/api/auth/status', {
                   method: 'GET',
                   credentials: 'include'
               });
@@ -151,7 +151,7 @@
       // Função para carregar detentos da API
       async function loadDetentos(searchTerm = '') {
         try {
-          const url = searchTerm ? `http://127.0.0.1:5000/api/detentos/?search=${encodeURIComponent(searchTerm)}` : 'http://127.0.0.1:5000/api/detentos/';
+          const url = searchTerm ? `https://api-kuzu.onrender.com/api/detentos/?search=${encodeURIComponent(searchTerm)}` : 'https://api-kuzu.onrender.com/api/detentos/';
           const response = await fetch(url, { credentials: 'include' });
           if (!response.ok) {
             if (response.status === 401) { // Não autorizado, redirecionar para login
@@ -224,7 +224,7 @@
         isEditing = editMode;
         try {
           // Requisição GET para o detento específico (sem barra final após o ID)
-          const response = await fetch(`http://127.0.0.1:5000/api/detentos/${id}`, { credentials: 'include' });
+          const response = await fetch(`https://api-kuzu.onrender.com/api/detentos/${id}`, { credentials: 'include' });
           if (!response.ok) {
             if (response.status === 401) { // Não autorizado, redirecionar para login
                 window.location.href = 'index.html';
@@ -286,7 +286,7 @@
 
               try {
                   // Requisição PUT para atualizar o detento (sem barra final após o ID)
-                  const response = await fetch(`http://127.0.0.1:5000/api/detentos/${currentDetentoId}`, {
+                  const response = await fetch(`https://api-kuzu.onrender.com/api/detentos/${currentDetentoId}`, {
                       method: 'PUT',
                       headers: {
                           'Content-Type': 'application/json'
@@ -353,7 +353,7 @@
         if (confirm('Tem certeza que deseja excluir este detento? Esta ação é irreversível.')) {
           try {
             // Requisição DELETE para o detento específico (sem barra final após o ID)
-            const response = await fetch(`http://127.0.0.1:5000/api/detentos/${id}`, {
+            const response = await fetch(`https://api-kuzu.onrender.com/api/detentos/${id}`, {
               method: 'DELETE',
               credentials: 'include'
             });
