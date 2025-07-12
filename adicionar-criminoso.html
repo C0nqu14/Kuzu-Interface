@@ -102,7 +102,7 @@
       // Função para verificar o status do login e redirecionar se não logado
       async function checkLoginStatus() {
           try {
-              const response = await fetch('http://127.0.0.1:5000/api/auth/status', {
+              const response = await fetch('https://api-kuzu.onrender.com/api/auth/status', {
                   method: 'GET',
                   credentials: 'include' // Envia cookies de sessão
               });
@@ -171,7 +171,7 @@
 
           try {
               // URL CORRIGIDA com a barra final para o POST de novos detentos
-              const response = await fetch('http://127.0.0.1:5000/api/detentos/', {
+              const response = await fetch('https://api-kuzu.onrender.com/api/detentos/', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
